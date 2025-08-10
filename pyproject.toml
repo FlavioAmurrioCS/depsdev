@@ -26,12 +26,18 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
+  "httpx",
 ]
 
 [project.optional-dependencies]
+cli = [
+  "rich",
+  "typer-slim",
+]
 tests = [
   "pytest",
   "tomli ; python_version < '3.11'",
+  "depsdev[cli]",
 ]
 types = [
   "depsdev[tests]",
