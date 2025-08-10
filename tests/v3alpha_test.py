@@ -39,9 +39,7 @@ async def test_all() -> None:
     print(await client.get_dependents(system, name, version))
     # print(await client.get_capabilities(system, name, version))
     print(
-        await client.get_project_batch(
-            ["github.com/facebook/react", "github.com/angular/angular"]
-        )
+        await client.get_project_batch(["github.com/facebook/react", "github.com/angular/angular"])
     )
 
     purl1 = "pkg:npm/@colors/colors"
