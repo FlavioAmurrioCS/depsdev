@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 from textwrap import dedent
 from typing import TYPE_CHECKING
@@ -12,6 +13,14 @@ if TYPE_CHECKING:
 
     P = ParamSpec("P")
     R = TypeVar("R")
+
+
+logging.basicConfig(
+    level=logging.ERROR,
+    format="[%(asctime)s] [%(levelname)-7s] [%(name)s] %(message)s",
+)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logger = logging.getLogger("depsdev")
 
 
 def to_sync() -> Callable[[Callable[P, R]], Callable[P, R]]:
@@ -30,7 +39,8 @@ def to_sync() -> Callable[[Callable[P, R]], Callable[P, R]]:
                 from rich import print_json
 
                 print_json(data=asyncio.run(func(*args, **kwargs)))  # type: ignore[arg-type]
-            except:  # noqa: E722
+            except Exception:
+                logger.exception("An error occurred while executing the command.")
                 raise SystemExit(1) from None
 
             raise SystemExit(0)
@@ -44,14 +54,6 @@ def main() -> None:
     """
     Main entry point for the CLI.
     """
-    import logging
-
-    logging.basicConfig(
-        level=logging.ERROR,
-        format="[%(asctime)s] [%(levelname)-7s] [%(name)s] %(message)s",
-    )
-    logging.getLogger("httpx").setLevel(logging.WARNING)
-    logger = logging.getLogger("depsdev")
 
     try:
         import typer
