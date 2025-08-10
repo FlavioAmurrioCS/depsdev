@@ -65,23 +65,9 @@ class DepsDevClientV3:
 
     async def get_package(self, system: System, name: str) -> Incomplete:
         """
-        GetPackage
-
-        GET /v3/systems/{packageKey.system}/packages/{packageKey.name}
-
         GetPackage returns information about a package, including a list of its available versions, with the default version marked if known.
 
-        Example: /v3/systems/npm/packages/%40colors%2Fcolors
-        Path parameters
-
-        packageKey.system: string
-
-            The package management system containing the package.
-
-            Can be one of GO, RUBYGEMS, NPM, CARGO, MAVEN, PYPI, NUGET.
-        packageKey.name: string
-
-            The name of the package.
+        GET /v3/systems/{packageKey.system}/packages/{packageKey.name}
         """  # noqa: E501
         return await self._requests(
             method="GET", url=f"/v3/systems/{system}/packages/{url_escape(name)}"
@@ -89,26 +75,9 @@ class DepsDevClientV3:
 
     async def get_version(self, system: System, name: str, version: str) -> Incomplete:
         """
-        GetVersion
-
-        GET /v3/systems/{versionKey.system}/packages/{versionKey.name}/versions/{versionKey.version}
-
         GetVersion returns information about a specific package version, including its licenses and any security advisories known to affect it.
 
-        Example: /v3/systems/npm/packages/%40colors%2Fcolors/versions/1.5.0
-        Path parameters
-
-        versionKey.system: string
-
-            The package management system containing the package.
-
-            Can be one of GO, RUBYGEMS, NPM, CARGO, MAVEN, PYPI, NUGET.
-        versionKey.name: string
-
-            The name of the package.
-        versionKey.version: string
-
-            The version of the package.
+        GET /v3/systems/{versionKey.system}/packages/{versionKey.name}/versions/{versionKey.version}
         """  # noqa: E501
         return await self._requests(
             method="GET",
@@ -117,28 +86,11 @@ class DepsDevClientV3:
 
     async def get_requirements(self, system: System, name: str, version: str) -> Incomplete:
         """
-        GetRequirements
-
-        GET /v3/systems/{versionKey.system}/packages/{versionKey.name}/versions/{versionKey.version}:requirements
-
         GetRequirements returns the requirements for a given version in a system-specific format. Requirements are currently available for Maven, npm, NuGet and RubyGems.
 
         Requirements are the dependency constraints specified by the version.
 
-        Example: /v3/systems/nuget/packages/castle.core/versions/5.1.1:requirements
-        Path parameters
-
-        versionKey.system: string
-
-            The package management system containing the package.
-
-            Can be one of GO, RUBYGEMS, NPM, CARGO, MAVEN, PYPI, NUGET.
-        versionKey.name: string
-
-            The name of the package.
-        versionKey.version: string
-
-            The version of the package.
+        GET /v3/systems/{versionKey.system}/packages/{versionKey.name}/versions/{versionKey.version}:requirements
         """  # noqa: E501
         return await self._requests(
             method="GET",
@@ -147,30 +99,13 @@ class DepsDevClientV3:
 
     async def get_dependencies(self, system: System, name: str, version: str) -> Incomplete:
         """
-        GetDependencies
-
-        GET /v3/systems/{versionKey.system}/packages/{versionKey.name}/versions/{versionKey.version}:dependencies
-
         GetDependencies returns a resolved dependency graph for the given package version. Dependencies are currently available for Go, npm, Cargo, Maven and PyPI.
 
         Dependencies are the resolution of the requirements (dependency constraints) specified by a version.
 
         The dependency graph should be similar to one produced by installing the package version on a generic 64-bit Linux system, with no other dependencies present. The precise meaning of this varies from system to system.
 
-        Example: /v3/systems/npm/packages/react/versions/18.2.0:dependencies
-        Path parameters
-
-        versionKey.system: string
-
-            The package management system containing the package.
-
-            Can be one of GO, RUBYGEMS, NPM, CARGO, MAVEN, PYPI, NUGET.
-        versionKey.name: string
-
-            The name of the package.
-        versionKey.version: string
-
-            The version of the package.
+        GET /v3/systems/{versionKey.system}/packages/{versionKey.name}/versions/{versionKey.version}:dependencies
         """  # noqa: E501
         return await self._requests(
             method="GET",
@@ -179,35 +114,17 @@ class DepsDevClientV3:
 
     async def get_project(self, project_id: str) -> Incomplete:
         """
-        GetProject
-
-        GET /v3/projects/{projectKey.id}
-
         GetProject returns information about projects hosted by GitHub, GitLab, or BitBucket, when known to us.
 
-        Example: /v3/projects/github.com%2Ffacebook%2Freact
-        Path parameters
-
-        projectKey.id: string
-
-            A project identifier of the form github.com/user/repo, gitlab.com/user/repo, or bitbucket.org/user/repo.
+        GET /v3/projects/{projectKey.id}
         """  # noqa: E501
         return await self._requests(method="GET", url=f"/v3/projects/{url_escape(project_id)}")
 
     async def get_project_package_versions(self, project_id: str) -> Incomplete:
         """
-        GetProjectPackageVersions
-
-        GET /v3/projects/{projectKey.id}:packageversions
-
         GetProjectPackageVersions returns known mappings between the requested project and package versions. At most 1500 package versions are returned. Mappings which were derived from attestations are served first.
 
-        Example: /v3/projects/github.com%2Ffacebook%2Freact:packageversions
-        Path parameters
-
-        projectKey.id: string
-
-            A project identifier of the form github.com/user/repo, gitlab.com/user/repo, or bitbucket.org/user/repo.
+        GET /v3/projects/{projectKey.id}:packageversions
         """  # noqa: E501
         return await self._requests(
             method="GET", url=f"/v3/projects/{url_escape(project_id)}:packageversions"
@@ -215,18 +132,9 @@ class DepsDevClientV3:
 
     async def get_advisory(self, advisory_id: str) -> Incomplete:
         """
-        GetAdvisory
-
-        GET /v3/advisories/{advisoryKey.id}
-
         GetAdvisory returns information about security advisories hosted by OSV.
 
-        Example: /v3/advisories/GHSA-2qrg-x229-3v8q
-        Path parameters
-
-        advisoryKey.id: string
-
-            The OSV identifier for the security advisory.
+        GET /v3/advisories/{advisoryKey.id}
         """
         return await self._requests(method="GET", url=f"/v3/advisories/{url_escape(advisory_id)}")
 
@@ -239,40 +147,11 @@ class DepsDevClientV3:
         version: Optional[str] = None,  # noqa: UP045
     ) -> Incomplete:
         """
-        Query
-
-        GET /v3/query
-
         Query returns information about multiple package versions, which can be specified by name, content hash, or both. If a hash was specified in the request, it returns the artifacts that matched the hash.
 
         Querying by content hash is currently supported for npm, Cargo, Maven, NuGet, PyPI and RubyGems. It is typical for hash queries to return many results; hashes are matched against multiple release artifacts (such as JAR files) that comprise package versions, and any given artifact may appear in several package versions.
 
-        Examples:
-
-            /v3/query?hash.type=SHA1&hash.value=ulXBPXrC%2FUTfnMgHRFVxmjPzdbk%3D
-            /v3/query?versionKey.system=NPM&versionKey.name=react&versionKey.version=18.2.0
-
-        Query parameters
-
-        hash.type: string
-
-            The function used to produce this hash.
-
-            Can be one of MD5, SHA1, SHA256, SHA512.
-        hash.value: string
-
-            A hash value.
-        versionKey.system: string
-
-            The package management system containing the package.
-
-            Can be one of GO, RUBYGEMS, NPM, CARGO, MAVEN, PYPI, NUGET.
-        versionKey.name: string
-
-            The name of the package.
-        versionKey.version: string
-
-            The version of the package.
+        GET /v3/query
         """  # noqa: E501
         params = {
             "hash.type": hash_type.value if hash_type else None,

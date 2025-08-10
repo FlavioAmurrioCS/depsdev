@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+from textwrap import dedent
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -61,15 +63,45 @@ def main() -> None:
         logger.error(msg)  # noqa: TRY400
         raise SystemExit(1) from None
 
-    from depsdev.v3alpha import DepsDevClientV3Alpha
-
-    client = DepsDevClientV3Alpha()
+    alpha = os.environ.get("DEPSDEV_V3_ALPHA", "false").lower() in ("true", "1", "yes")
 
     app = typer.Typer(
         name="depsdev",
-        help="A CLI tool to interact with the https://docs.deps.dev/api/",
         no_args_is_help=True,
+        rich_markup_mode="rich",
+        help=dedent(
+            """\
+            A CLI tool to interact with the https://docs.deps.dev/api/
+
+            ## Package names
+
+            In general, the API refers to packages by the names used within their ecosystem, including details such as capitalization.
+
+            Exceptions:
+
+            - Maven names are of the form <group ID>:<artifact ID>, for example org.apache.logging.log4j:log4j-core.
+            - PyPI names are normalized as per PEP 503.
+            - NuGet names are normalized through lowercasing according to the Package Content API request parameter specification. Versions are normalized according to NuGet 3.4+ rules.
+
+            ## Purl parameters
+
+            Some methods accept purls, or package URLs, which have their own rules about how components should be encoded. https://github.com/package-url/purl-spec
+
+            For example, the npm package @colors/colors has the purl pkg:npm/@colors/colors.
+
+            To enable the alpha features, set the environment variable DEPSDEV_V3_ALPHA to true.
+            """,  # noqa: E501
+        ),
     )
+
+    from depsdev.v3 import DepsDevClientV3
+    from depsdev.v3alpha import DepsDevClientV3Alpha
+
+    client_v3_alpha = DepsDevClientV3Alpha()
+    client_v3 = DepsDevClientV3()
+
+    client = client_v3 if not alpha else client_v3_alpha
+
     app.command(rich_help_panel="v3")(to_sync()(client.get_package))
     app.command(rich_help_panel="v3")(to_sync()(client.get_version))
     app.command(rich_help_panel="v3")(to_sync()(client.get_requirements))
@@ -79,14 +111,17 @@ def main() -> None:
     app.command(rich_help_panel="v3")(to_sync()(client.get_advisory))
     app.command(rich_help_panel="v3")(to_sync()(client.query))
 
-    # app.command(rich_help_panel="v3alpha")(to_sync()(client.get_version_batch))
-    app.command(rich_help_panel="v3alpha")(to_sync()(client.get_dependents))
-    app.command(rich_help_panel="v3alpha")(to_sync()(client.get_capabilities))
-    app.command(rich_help_panel="v3alpha")(to_sync()(client.get_project_batch))
-    app.command(rich_help_panel="v3alpha")(to_sync()(client.get_similarly_named_packages))
-    app.command(rich_help_panel="v3alpha")(to_sync()(client.purl_lookup))
-    app.command(rich_help_panel="v3alpha")(to_sync()(client.purl_lookup_batch))
-    app.command(rich_help_panel="v3alpha")(to_sync()(client.query_container_images))
+    if alpha:
+        # app.command(rich_help_panel="v3alpha")(to_sync()(client_v3_alpha.get_version_batch))
+        app.command(rich_help_panel="v3alpha")(to_sync()(client_v3_alpha.get_dependents))
+        app.command(rich_help_panel="v3alpha")(to_sync()(client_v3_alpha.get_capabilities))
+        app.command(rich_help_panel="v3alpha")(to_sync()(client_v3_alpha.get_project_batch))
+        app.command(rich_help_panel="v3alpha")(
+            to_sync()(client_v3_alpha.get_similarly_named_packages)
+        )
+        app.command(rich_help_panel="v3alpha")(to_sync()(client_v3_alpha.purl_lookup))
+        app.command(rich_help_panel="v3alpha")(to_sync()(client_v3_alpha.purl_lookup_batch))
+        app.command(rich_help_panel="v3alpha")(to_sync()(client_v3_alpha.query_container_images))
 
     return app()
 

@@ -8,13 +8,19 @@
 
 ## Table of Contents
 
+- [Overview](#overview)
 - [Installation](#installation)
 - [License](#license)
 
+## Overview
+
+Thin Python wrapper (async-first) around the public [deps.dev REST API](https://deps.dev) plus an optional Typer-based CLI. Provides straightforward methods mapping closely to the documented endpoints; responses are returned as decoded JSON (dict / list). Alpha endpoints can be enabled via `DEPSDEV_V3_ALPHA=true` and may change without notice.
+
 ## Installation
 
-```console
-pip install depsdev
+```bash
+pip install depsdev            # library only
+pip install depsdev[cli]       # library + CLI
 ```
 
 ## License
