@@ -38,6 +38,7 @@ tests = [
   "pytest",
   "tomli ; python_version < '3.11'",
   "depsdev[cli]",
+  "pytest-asyncio",
 ]
 types = [
   "depsdev[tests]",

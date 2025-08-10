@@ -24,6 +24,9 @@ class HashType(str, Enum):
     SHA256 = "SHA256"
     SHA512 = "SHA512"
 
+    def __str__(self) -> str:
+        return self.value
+
 
 class System(str, Enum):
     GO = "GO"
@@ -34,6 +37,9 @@ class System(str, Enum):
     PYPI = "PYPI"
     NUGET = "NUGET"
 
+    def __str__(self) -> str:
+        return self.value
+
 
 def url_escape(string: str) -> str:
     return quote(string, safe="")
@@ -41,7 +47,7 @@ def url_escape(string: str) -> str:
 
 @dataclass
 class DepsDevClientV3:
-    client: httpx.AsyncClient = field(init=False)
+    client: httpx.AsyncClient = field(init=False, repr=False)
     timeout: float = 5.0
     base_url: str = "https://api.deps.dev"
 
@@ -55,6 +61,7 @@ class DepsDevClientV3:
         params: QueryParamTypes | None = None,
         json: object | None = None,
     ) -> Incomplete:
+        logger.info(locals())
         response = await self.client.request(method=method, url=url, params=params, json=json)
         if not response.is_success:
             logger.error(
