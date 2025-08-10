@@ -26,12 +26,18 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
+  "httpx",
 ]
 
 [project.optional-dependencies]
+cli = [
+  "rich",
+  "typer-slim",
+]
 tests = [
   "pytest",
   "tomli ; python_version < '3.11'",
+  "depsdev[cli]",
 ]
 types = [
   "depsdev[tests]",
@@ -173,7 +179,7 @@ ignore = [
 
 [tool.ruff.format]
 docstring-code-format = true
-docstring-code-line-length = 100
+docstring-code-line-length = 999
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = [
