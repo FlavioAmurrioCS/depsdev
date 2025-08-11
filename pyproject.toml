@@ -27,6 +27,7 @@ classifiers = [
 ]
 dependencies = [
   "httpx",
+  "packageurl-python",
 ]
 
 [project.optional-dependencies]

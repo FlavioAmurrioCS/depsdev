@@ -1,6 +1,21 @@
 from __future__ import annotations
 
 import logging
+import sys
+
+from depsdev.cli.purl import get_extractor
+from depsdev.cli.vuln import main_helper
+
+try:
+    import typer
+except ImportError:
+    msg = (
+        "The 'cli' optional dependency is not installed. "
+        "Please install it with 'pip install depsdev[cli]'."
+    )
+    print(msg, file=sys.stderr)
+    raise SystemExit(1) from None
+
 import os
 from textwrap import dedent
 from typing import TYPE_CHECKING
@@ -13,7 +28,6 @@ if TYPE_CHECKING:
 
     P = ParamSpec("P")
     R = TypeVar("R")
-
 
 logging.basicConfig(
     level=logging.ERROR,
@@ -38,7 +52,9 @@ def to_sync() -> Callable[[Callable[P, R]], Callable[P, R]]:
 
                 from rich import print_json
 
-                print_json(data=asyncio.run(func(*args, **kwargs)))  # type: ignore[arg-type]
+                result: object = asyncio.run(func(*args, **kwargs))  # type: ignore[arg-type]
+                if result is not None:
+                    print_json(data=result)
             except Exception:
                 logger.exception("An error occurred while executing the command.")
                 raise SystemExit(1) from None
@@ -50,25 +66,14 @@ def to_sync() -> Callable[[Callable[P, R]], Callable[P, R]]:
     return decorator
 
 
-def main() -> None:
+def create_app() -> typer.Typer:
     """
     Main entry point for the CLI.
     """
-
-    try:
-        import typer
-    except ImportError:
-        msg = (
-            "The 'cli' optional dependency is not installed. "
-            "Please install it with 'pip install depsdev[cli]'."
-        )
-        logger.error(msg)  # noqa: TRY400
-        raise SystemExit(1) from None
-
     alpha = os.environ.get("DEPSDEV_V3_ALPHA", "false").lower() in ("true", "1", "yes")
 
     app = typer.Typer(
-        name="depsdev",
+        name="api",
         no_args_is_help=True,
         rich_markup_mode="rich",
         help=dedent(
@@ -125,7 +130,49 @@ def main() -> None:
         app.command(rich_help_panel="v3alpha")(to_sync()(client_v3_alpha.purl_lookup_batch))
         app.command(rich_help_panel="v3alpha")(to_sync()(client_v3_alpha.query_container_images))
 
-    return app()
+    return app
+
+
+main = typer.Typer(
+    name="depsdev",
+    no_args_is_help=True,
+    rich_markup_mode="rich",
+)
+
+main.add_typer(
+    create_app(),
+    name="api",
+)
+
+
+@main.command(name="purl", rich_help_panel="Utils")
+def purl(filename: str) -> None:
+    """
+    Extract package URLs from various formats.
+    """
+    extractor = get_extractor(filename)
+
+    for purl in extractor.extract(filename):
+        print(purl)
+
+
+main.command(name="vuln", rich_help_panel="Utils")(to_sync()(main_helper))
+
+
+@main.command()
+@to_sync()
+async def report(filename: str) -> None:
+    """
+    Show vulnerabilities for packages in a file.
+
+    Example usage:
+        depsdev report requirements.txt
+        depsdev report pom.xml
+        depsdev report Pipfile.lock
+    """
+    extractor = get_extractor(filename)
+    packages = extractor.extract(filename)
+    await main_helper([x.to_string() for x in packages])
 
 
 if __name__ == "__main__":
