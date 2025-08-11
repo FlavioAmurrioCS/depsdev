@@ -34,7 +34,7 @@ class MavenExtractor:
             check=False,
             capture_output=True,
             text=True,
-            cwd=os.path.dirname(filename),
+            cwd=os.path.dirname(os.path.abspath(filename)),
         )
         if result.returncode != 0:
             print(result.stderr, file=sys.stderr)
