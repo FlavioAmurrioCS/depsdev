@@ -64,7 +64,7 @@ async def main_helper(packages: list[str]) -> int:
         for vuln in advisories:
             table.add_row(
                 f"[link=https://github.com/advisories/{vuln['id']}]{vuln['id']}[/link]",
-                vuln["summary"],
+                vuln.get("summary"),
                 get_version_fix(vuln) or "unknown",
             )
         console.print(table)

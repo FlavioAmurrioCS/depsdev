@@ -170,6 +170,7 @@ async def report(filename: str) -> None:
         depsdev report pom.xml
         depsdev report Pipfile.lock
     """
+    filename = os.path.abspath(filename)
     extractor = get_extractor(filename)
     packages = extractor.extract(filename)
     await main_helper([x.to_string() for x in packages])
