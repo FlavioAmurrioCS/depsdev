@@ -48,7 +48,7 @@ class MavenExtractor:
         """
         package, *rest = line.split()
         _is_optional = bool(rest)
-        group, artifact, _type, version, *classifier = package.split(":")
+        group, artifact, _type, version, *_classifier = package.split(":")
         return PackageURL(
             type="maven",
             namespace=group,
@@ -118,6 +118,7 @@ class RequirementsExtractor:
                 parts = _line.split(";")[0].split("==")
                 if len(parts) == 2:  # noqa: PLR2004
                     name, version = parts
+                    version = version.strip(" \\")
                     yield PackageURL(
                         type="pypi",
                         namespace=None,
