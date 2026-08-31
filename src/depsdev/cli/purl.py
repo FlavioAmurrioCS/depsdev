@@ -63,8 +63,10 @@ class MavenExtractor:
         stage1 = (x.rstrip() for x in lines if x.strip())
         stage2 = itertools.dropwhile(lambda x: not x.startswith("[INFO] --- "), stage1)
         stage3 = itertools.takewhile(
-            lambda x: not x.startswith(
-                "[INFO] ------------------------------------------------------------------------"
+            lambda x: (
+                not x.startswith(
+                    "[INFO] ------------------------------------------------------------------------"
+                )
             ),
             stage2,
         )
